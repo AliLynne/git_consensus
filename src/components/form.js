@@ -1,12 +1,17 @@
 import React from 'react'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 
+import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormGroup from '@material-ui/core/FormGroup';
+import FormGroup from '@material-ui/core/FormGroup'
 import FormLabel from '@material-ui/core/FormLabel'
+import MenuItem from '@material-ui/core/MenuItem'
+import Select from '@material-ui/core/Select'
 import Switch from '@material-ui/core/Switch'
 import TextField from '@material-ui/core/TextField'
+import Tooltip from '@material-ui/core/Tooltip'
+import Typography from '@material-ui/core/Typography'
 
 class Form extends React.Component {
   constructor(props) {
@@ -32,7 +37,8 @@ class Form extends React.Component {
       consensusLock: false,
       consensusDelay: 96,
       contributorsOnly: false,
-      collaboratorsOnly: false
+      collaboratorsOnly: false,
+      template: "recommended"
     }
   }
 
@@ -45,6 +51,65 @@ class Form extends React.Component {
 
   handleToggle = (key, event) => {
     this.setState({ [key]: event.target.checked })
+  }
+
+  handleTemplate = (e) => {
+    console.log(e.target.value)
+    switch(e.target.value) {
+      case "anarchy":
+        this.setState({
+          version: 3,
+          extraLabels: false,
+          preventDoubles: false,
+          quorum: 1,
+          threshold: 0.01,
+          mergeDelay: 1,
+          delayOverride: false,
+          timeout: 168,
+          licenseLock: true,
+          consensusLock: false,
+          consensusDelay: 1,
+          contributorsOnly: false,
+          collaboratorsOnly: false,
+          template: "anarchy"
+        })
+        break
+      case "autocracy":
+        this.setState({
+          version: 3,
+          extraLabels: false,
+          preventDoubles: true,
+          quorum: 1,
+          threshold: 0.01,
+          mergeDelay: 1,
+          delayOverride: false,
+          timeout: 168,
+          licenseLock: true,
+          consensusLock: false,
+          consensusDelay: 1,
+          contributorsOnly: false,
+          collaboratorsOnly: false,
+          template: "autocracy"
+        })
+        break
+      default:
+        this.setState({
+          version: 3,
+          extraLabels: false,
+          preventDoubles: true,
+          quorum: 3,
+          threshold: 0.74,
+          mergeDelay: 12,
+          delayOverride: 6,
+          timeout: 168,
+          licenseLock: true,
+          consensusLock: false,
+          consensusDelay: 96,
+          contributorsOnly: false,
+          collaboratorsOnly: false,
+          template: "recommended"
+        })
+    }
   }
 
   render() {
@@ -93,40 +158,69 @@ class Form extends React.Component {
 
     return (
       <>
-        <form style={{ marginTop: 40}} noValidate autoComplete="off">
+        <form style={{ display: "flex", flexDirection: "column", marginTop: 40}} noValidate autoComplete="off">
+          <Typography variant="h4">Choose a Template</Typography>
+          <FormControl component="fieldset">
+            
+            <InputLabel htmlFor="template">Template</InputLabel>
+            <Select
+              value={this.state.template}
+              onChange={this.handleTemplate}
+              inputProps={{
+                name: 'template',
+                id: 'template',
+              }}
+            >
+              <MenuItem value={"anarchy"}>Anarchy</MenuItem>
+              <MenuItem value={"autocracy"}>Autocracy</MenuItem>
+              <MenuItem value={"consensus"}>Consensus</MenuItem>
+              <MenuItem value={"democracy"}>Democracy</MenuItem>
+              <MenuItem value={"meritocracy"}>Meritocracy</MenuItem>
+              <MenuItem value={"oligarchy"}>Oligarchy</MenuItem>
+              <MenuItem value={"recommended"}>Recommended</MenuItem>
+              <MenuItem value={"adventure"}>Choose your own adventure</MenuItem>
+            </Select>
+          </FormControl>
           <FormControl component="fieldset">
             <FormLabel component="legend">Basic Info</FormLabel>
             <FormGroup row>
-              <TextField
-                id="version"
-                label="Version"
-                className=''
-                value={this.state.version}
-                onChange={this.handleChange}
-                margin="normal"
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={this.state.extraLabels}
-                    onChange={this.handleLabels}
-                    value="extraLabels"
-                    inputProps={{ 'aria-label': 'Extra Labels' }}
-                  />
-                }
-                label="Extra Labels"
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={this.state.preventDoubles}
-                    onChange={this.handleDoubles}
-                    value="preventDoubles"
-                    inputProps={{ 'aria-label': 'Prevent Doubles' }}
-                  />
-                }
-                label="Prevent Doubles"
-              />
+              <Tooltip title="Only change for backwards compatibility." placement="top">
+                <TextField
+                  id="version"
+                  label="Version"
+                  className=''
+                  value={this.state.version}
+                  onChange={this.handleChange}
+                  margin="normal"
+                />
+              </Tooltip>
+              
+              <Tooltip title="Add extra labels for the vote counts and age when merging" placement="top">
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.extraLabels}
+                      onChange={this.handleLabels}
+                      value="extraLabels"
+                      inputProps={{ 'aria-label': 'Extra Labels' }}
+                    />
+                  }
+                  label="Extra Labels"
+                />
+              </Tooltip>
+              <Tooltip title="Don't count any vote from a user who votes for multiple options" placement="top">
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.preventDoubles}
+                      onChange={this.handleDoubles}
+                      value="preventDoubles"
+                      inputProps={{ 'aria-label': 'Prevent Doubles' }}
+                    />
+                  }
+                  label="Prevent Doubles"
+                />
+              </Tooltip>
             </FormGroup>
           </FormControl>
           <FormControl component="fieldset">
